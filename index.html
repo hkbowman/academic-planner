@@ -40,12 +40,6 @@
             border-color: #f6c343 !important;
             background-color: rgba(246, 195, 67, 0.08) !important;
         }
-        .drop-target-before {
-            border-top: 3px solid #f6c343 !important;
-        }
-        .drop-target-after {
-            border-bottom: 3px solid #f6c343 !important;
-        }
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; color: black !important; padding: 0 !important; }
@@ -558,11 +552,9 @@
             openConfirmModal(async (confirmed) => {
                 if (confirmed) {
                     try {
-                        // Delete existing
                         for (let c of courses) {
                             await deleteDoc(doc(db, "courses", c.id));
                         }
-                        // Re-add defaults
                         for (let c of defaultCourses) {
                             await addDoc(collection(db, "courses"), c);
                         }
@@ -611,13 +603,11 @@
                 }
             });
 
-            // Update semester credit banners
             for (const [sem, credits] of Object.entries(semesterCredits)) {
                 const box = document.querySelector(`.semester-box[data-semester="${sem}"] .semester-credits`);
                 if (box) box.textContent = `(${credits} credits)`;
             }
 
-            // Update year header badges
             document.getElementById('year1TotalCredits').textContent = `${yearCredits.y1} Cr`;
             document.getElementById('year2TotalCredits').textContent = `${yearCredits.y2} Cr`;
             document.getElementById('year3TotalCredits').textContent = `${yearCredits.y3} Cr`;
@@ -626,8 +616,9 @@
 
         function createCourseCard(course, isDimmed) {
             const card = document.createElement('div');
-            card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-lg border shadow-xs flex items-center justify-between gap-2 transition-all ${isDimmed ? 'opacity-30' : 'opacity-100'} ${course.completed ? 'border-green-500/50 bg-green-50/20 dark:bg-green-950/10' : 'border-slate-200 dark:border-slate-700'}`;
+            card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-lg border shadow-xs flex items-center justify-between gap-2 transition-all cursor-grab active:cursor-grabbing ${isDimmed ? 'opacity-30' : 'opacity-100'} ${course.completed ? 'border-green-500/50 bg-green-50/20 dark:bg-green-950/10' : 'border-slate-200 dark:border-slate-700'}`;
             card.draggable = true;
+            card.dataset.courseId = course.id;
 
             card.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', course.id);
@@ -705,8 +696,10 @@
         window.dropCourse = async function(e) {
             e.preventDefault();
             e.currentTarget.classList.remove('drag-over');
+            
             const courseId = e.dataTransfer.getData('text/plain');
             const targetSemester = e.currentTarget.getAttribute('data-semester');
+            
             if (courseId && targetSemester) {
                 try {
                     await updateDoc(doc(db, "courses", courseId), { semester: targetSemester });
