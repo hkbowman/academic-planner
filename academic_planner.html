@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Plan Planner - 2x2 Quadrant Layout</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ndNavy: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            700: '#1e3a8a',
+                            800: '#0c2340',
+                            900: '#0a192f',
+                        },
+                        ndGold: {
+                            400: '#f6c343',
+                            500: '#C99700',
+                            600: '#8c732b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .dragging {
+            opacity: 0.4;
+            transform: scale(0.98);
+        }
+        .drag-over {
+            border-color: #f6c343 !important;
+            background-color: rgba(246, 195, 67, 0.08) !important;
+        }
+        .drop-target-before {
+            border-top: 3px solid #f6c343 !important;
+        }
+        .drop-target-after {
+            border-bottom: 3px solid #f6c343 !important;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; padding: 0 !important; }
+            .shadow-lg, .shadow-md, .shadow-sm { box-shadow: none !important; border: 1px solid #ccc !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <!-- Custom Notification Box (Replaces Alert) -->
+    <div id="notificationToast" class="fixed bottom-4 right-4 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <i data-lucide="info" class="w-4 h-4 text-ndGold-400 dark:text-ndNavy-700"></i>
+        <span id="notificationMessage" class="text-xs font-semibold">Notification message</span>
+    </div>
+
+    <!-- Header Banner -->
+    <header class="bg-ndNavy-800 text-white shadow-md border-b-4 border-ndGold-400 no-print">
+        <div class="max-w-[98%] mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="px-2 py-0.5 bg-ndGold-400 text-ndNavy-800 rounded font-black text-sm">ND</span>
+                    <h1 class="text-xl font-bold tracking-tight">Four Year Academic Plan</h1>
+                </div>
+                <p class="text-slate-300 text-xs mt-0.5">CSBA Major | Bus Econ Minor | Innov. & Entrep. Minor (Mendoza)</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-1.5">
+                <button onclick="toggleDarkMode()" class="p-1.5 rounded-lg bg-ndNavy-700 hover:bg-ndNavy-900 text-slate-200 transition" title="Toggle Dark Mode">
+                    <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-ndGold-400"></i>
+                </button>
+                <button onclick="openAddModal()" class="px-2.5 py-1.5 bg-ndGold-400 hover:bg-yellow-500 text-ndNavy-900 font-bold rounded-lg shadow text-xs flex items-center gap-1 transition">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Course
+                </button>
+                <button onclick="exportData()" class="px-2.5 py-1.5 bg-ndNavy-700 hover:bg-ndNavy-900 text-slate-200 rounded-lg text-xs font-medium flex items-center gap-1 transition" title="Export Plan JSON">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Export JSON
+                </button>
+                <label class="px-2.5 py-1.5 bg-ndNavy-700 hover:bg-ndNavy-900 text-slate-200 rounded-lg text-xs font-medium flex items-center gap-1 cursor-pointer transition" title="Import Plan JSON">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import JSON
+                    <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+                </label>
+                <button onclick="window.print()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-medium flex items-center gap-1 transition">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print / PDF
+                </button>
+                <button onclick="resetToDefaultPlan()" class="px-2.5 py-1.5 bg-red-600/20 hover:bg-red-600/40 text-red-200 rounded-lg text-xs font-medium flex items-center gap-1 transition" title="Reset to original default template">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
+
+        <!-- Top Overview Stats Bar (Strict Order: Planned Credits, With IB/AP Transfer, Completed) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- 1. Planned Credits -->
+            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
+                <div class="p-2.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">Planned Credits</div>
+                    <div id="statTotalPlanned" class="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">0</div>
+                </div>
+            </div>
+
+            <!-- 2. With IB/AP Transfer -->
+            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
+                <div class="p-2.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg">
+                    <i data-lucide="award" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">With IB/AP Transfer</div>
+                    <div id="statWithIB" class="text-xl font-black text-amber-600 dark:text-amber-400 leading-none mt-1">0</div>
+                </div>
+            </div>
+
+            <!-- 3. Completed -->
+            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
+                <div class="p-2.5 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-lg">
+                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">Completed</div>
+                    <div id="statCompleted" class="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <i data-lucide="filter" class="w-4 h-4 text-slate-400"></i>
+                <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Filter Category:</span>
+                <select id="categoryFilter" onchange="filterCourses()" class="bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs px-3 py-1.5 focus:ring-2 focus:ring-ndNavy-700 text-slate-800 dark:text-slate-100 font-medium">
+                    <option value="ALL">All Categories</option>
+                    <option value="Univ">Univ Requirements</option>
+                    <option value="Major">Major (CSBA)</option>
+                    <option value="Minor">Minor (Bus Econ / Innov)</option>
+                    <option value="A&L">A&L</option>
+                    <option value="Elective">Free Electives</option>
+                </select>
+            </div>
+            
+            <div class="relative w-full sm:w-64">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                <input type="text" id="searchInput" onkeyup="filterCourses()" placeholder="Search courses..." class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs pl-9 pr-3 py-1.5 focus:ring-2 focus:ring-ndNavy-700 text-slate-800 dark:text-slate-100">
+            </div>
+        </div>
+
+        <!-- Academic Plan Layout (2x2 Quadrants) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5" id="yearsContainer">
+            
+            <!-- Quadrant 1: Top-Left (First Year) -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
+                <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">First Year</h2>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year1TotalCredits">34 Cr</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
+                    <!-- Fall Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y1f">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(17 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y1f"></div>
+                    </div>
+                    <!-- Spring Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y1s">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(17 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y1s"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quadrant 2: Top-Right (Sophomore Year) -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
+                <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">Sophomore Year</h2>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year2TotalCredits">31 Cr</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
+                    <!-- Fall Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y2f">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(16 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y2f"></div>
+                    </div>
+                    <!-- Spring Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y2s">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(15 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y2s"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quadrant 3: Bottom-Left (Junior Year) -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
+                <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">Junior Year</h2>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year3TotalCredits">30 Cr</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
+                    <!-- Fall Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y3f">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(15 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y3f"></div>
+                    </div>
+                    <!-- Spring Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y3s">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(15 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y3s"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quadrant 4: Bottom-Right (Senior Year) -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
+                <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">Senior Year</h2>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year4TotalCredits">25 Cr</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
+                    <!-- Fall Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y4f">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(12 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y4f"></div>
+                    </div>
+                    <!-- Spring Semester -->
+                    <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y4s">
+                        <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(13 credits)</span></h3>
+                        </div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y4s"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Dynamic Degree Summary & Credit Formula Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl border-2 border-ndNavy-800 dark:border-ndGold-400 p-4 shadow-md">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">
+                <div class="space-y-2">
+                    <div>
+                        <h2 class="text-base font-bold text-ndNavy-900 dark:text-ndGold-400 flex items-center gap-1.5">
+                            <i data-lucide="graduation-cap" class="w-5 h-5"></i> Dynamic Degree Clearance & Transfer Credits
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Cumulative total calculated dynamically across completed and planned semesters</p>
+                    </div>
+
+                    <!-- Interactive Transfer Credits Input -->
+                    <div class="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-700/60 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600">
+                        <label for="transferCreditsInput" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1">
+                            <i data-lucide="award" class="w-4 h-4 text-amber-500"></i> IB/AP Transfer Credits:
+                        </label>
+                        <input type="number" id="transferCreditsInput" min="0" max="60" value="8" onchange="updateTransferCredits(this.value)" onkeyup="updateTransferCredits(this.value)" class="w-16 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-500 rounded px-2 py-0.5 text-xs font-black text-slate-900 dark:text-white focus:ring-1 focus:ring-ndNavy-700 text-center">
+                    </div>
+                </div>
+                
+                <!-- Dynamic Formula Display -->
+                <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 rounded-lg p-3 text-center min-w-[280px]">
+                    <div class="text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-300 mb-0.5">Credit Formula</div>
+                    <div class="text-sm sm:text-base font-extrabold text-amber-950 dark:text-amber-100">
+                        <span id="formulaWithIB" class="text-amber-600 dark:text-amber-400">128</span> Credits = <span id="formulaCalculated">120</span> Planned + <span id="formulaTransferCount">8</span> IB/AP Transfer
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div class="bg-slate-50 dark:bg-slate-900/60 rounded-lg p-3 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                <p>• Note: Seniors may fall below the 12-credit full-time minimum in their final semester with departmental permission.</p>
+                <p>• A multi-counted course can be used no more than once at each level - university, college, program (major/minor).</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Add/Edit Course Modal -->
+    <div id="courseModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50 no-print">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-md overflow-hidden">
+            <div class="bg-ndNavy-800 text-white px-5 py-3 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-sm">Add New Course</h3>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form id="courseForm" onsubmit="saveCourse(event)" class="p-5 space-y-3">
+                <input type="hidden" id="courseId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase mb-1">Course Title</label>
+                    <input type="text" id="courseTitle" required placeholder="e.g. Data Structures" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 text-xs focus:ring-2 focus:ring-ndNavy-700 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase mb-1">Credits</label>
+                    <input type="number" step="0.5" min="0" max="10" id="courseCredits" required value="3" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 text-xs focus:ring-2 focus:ring-ndNavy-700 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase mb-1.5">Categories (Select All That Apply)</label>
+                    <div class="grid grid-cols-2 gap-1.5 bg-slate-50 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
+                        <label class="flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
+                            <input type="checkbox" value="Univ" class="category-checkbox rounded text-ndNavy-700 focus:ring-ndNavy-700"> Univ Req
+                        </label>
+                        <label class="flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
+                            <input type="checkbox" value="Major" class="category-checkbox rounded text-ndNavy-700 focus:ring-ndNavy-700"> Major (CSBA)
+                        </label>
+                        <label class="flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
+                            <input type="checkbox" value="Minor" class="category-checkbox rounded text-ndNavy-700 focus:ring-ndNavy-700"> Minor
+                        </label>
+                        <label class="flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
+                            <input type="checkbox" value="A&L" class="category-checkbox rounded text-ndNavy-700 focus:ring-ndNavy-700"> A&L
+                        </label>
+                        <label class="flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer col-span-2">
+                            <input type="checkbox" value="Elective" class="category-checkbox rounded text-ndNavy-700 focus:ring-ndNavy-700"> Free Elective
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase mb-1">Semester</label>
+                    <select id="courseSemester" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 text-xs focus:ring-2 focus:ring-ndNavy-700 dark:text-white">
+                        <option value="y1f">First Year - Fall</option>
+                        <option value="y1s">First Year - Spring</option>
+                        <option value="y2f">Sophomore Year - Fall</option>
+                        <option value="y2s">Sophomore Year - Spring</option>
+                        <option value="y3f">Junior Year - Fall</option>
+                        <option value="y3s">Junior Year - Spring</option>
+                        <option value="y4f">Senior Year - Fall</option>
+                        <option value="y4s">Senior Year - Spring</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="courseCompleted" class="w-3.5 h-3.5 rounded text-ndNavy-700 focus:ring-ndNavy-700">
+                    <label for="courseCompleted" class="text-xs font-medium text-slate-700 dark:text-slate-300">Mark as Completed</label>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-700">
+                    <button type="button" onclick="closeModal()" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 bg-ndNavy-800 hover:bg-ndNavy-900 text-white font-semibold rounded-lg text-xs shadow">Save Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Move Course Quick Modal (Mobile support) -->
+    <div id="moveModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50 no-print">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-xs overflow-hidden p-5 space-y-3">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Move Course To...</h3>
+            <p id="moveCourseTitle" class="text-xs text-amber-600 dark:text-amber-400 font-semibold truncate"></p>
+            <input type="hidden" id="moveCourseId">
+            <select id="targetSemesterSelect" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 text-xs dark:text-white">
+                <option value="y1f">First Year - Fall</option>
+                <option value="y1s">First Year - Spring</option>
+                <option value="y2f">Sophomore Year - Fall</option>
+                <option value="y2s">Sophomore Year - Spring</option>
+                <option value="y3f">Junior Year - Fall</option>
+                <option value="y3s">Junior Year - Spring</option>
+                <option value="y4f">Senior Year - Fall</option>
+                <option value="y4s">Senior Year - Spring</option>
+            </select>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeMoveModal()" class="px-3 py-1 text-xs text-slate-500 hover:text-slate-700">Cancel</button>
+                <button onclick="confirmMoveCourse()" class="px-3 py-1 bg-ndGold-400 hover:bg-yellow-500 text-ndNavy-900 font-bold rounded-lg text-xs">Move</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog Modal (Replaces Confirm) -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50 no-print">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-sm overflow-hidden p-5 space-y-3 text-center">
+            <div class="w-10 h-10 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Reset Academic Plan?</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Reset to default 4-year curriculum template? Any custom changes will be overwritten.</p>
+            <div class="flex justify-center gap-2 pt-2">
+                <button onclick="closeConfirmModal(false)" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Cancel</button>
+                <button onclick="closeConfirmModal(true)" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs">Confirm Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script>
+        const defaultCourses = [
+            // First Year - Fall (17 credits)
+            { id: 'c1', title: 'Writing & Rhetoric', credits: 3, semester: 'y1f', categories: ['Univ'], completed: true },
+            { id: 'c2', title: 'Intro Philosophy', credits: 3, semester: 'y1f', categories: ['Univ'], completed: true },
+            { id: 'c3', title: 'Moreau Part 1', credits: 1, semester: 'y1f', categories: ['Univ'], completed: true },
+            { id: 'c4', title: 'Intro Hispanic Lit & Culture', credits: 3, semester: 'y1f', categories: ['A&L'], completed: true },
+            { id: 'c5', title: 'Microeconomics', credits: 3, semester: 'y1f', categories: ['A&L', 'Minor'], completed: true },
+            { id: 'c6', title: 'Calculus I', credits: 4, semester: 'y1f', categories: ['Major'], completed: true },
+
+            // First Year - Spring (17 credits)
+            { id: 'c7', title: 'Theology 1', credits: 3, semester: 'y1s', categories: ['Univ'], completed: true },
+            { id: 'c8', title: 'Univ Seminar / History USEM', credits: 3, semester: 'y1s', categories: ['Univ'], completed: true },
+            { id: 'c9', title: 'Intro to Jazz', credits: 3, semester: 'y1s', categories: ['Univ'], completed: true },
+            { id: 'c10', title: 'Calculus II', credits: 4, semester: 'y1s', categories: ['Major'], completed: true },
+            { id: 'c11', title: 'Fundamentals for Computing', credits: 4, semester: 'y1s', categories: ['Major'], completed: true },
+
+            // Sophomore Year - Fall (16 credits)
+            { id: 'c12', title: 'Elementary Cosmology', credits: 3, semester: 'y2f', categories: ['Univ'], completed: false },
+            { id: 'c13', title: 'Calculus III', credits: 3.5, semester: 'y2f', categories: ['Major'], completed: false },
+            { id: 'c14', title: 'Discrete Mathematics', credits: 3, semester: 'y2f', categories: ['Major'], completed: false },
+            { id: 'c15', title: 'Data Structures', credits: 3.5, semester: 'y2f', categories: ['Major'], completed: false },
+            { id: 'c16', title: 'Human Comp Interaction', credits: 3, semester: 'y2f', categories: ['Major'], completed: false },
+
+            // Sophomore Year - Spring (15 credits)
+            { id: 'c17', title: 'Philosophy 2', credits: 3, semester: 'y2s', categories: ['Univ'], completed: false },
+            { id: 'c18', title: 'Systems Programming', credits: 3, semester: 'y2s', categories: ['Major'], completed: false },
+            { id: 'c19', title: 'College Seminar CSEM', credits: 3, semester: 'y2s', categories: ['A&L', 'Univ'], completed: false },
+            { id: 'c20', title: 'Macroeconomics', credits: 3, semester: 'y2s', categories: ['Minor'], completed: false },
+            { id: 'c21', title: 'Essentials in Innovation', credits: 3, semester: 'y2s', categories: ['Minor'], completed: false },
+
+            // Junior Year - Fall (15 credits)
+            { id: 'c22', title: 'Probability and Statistics', credits: 3, semester: 'y3f', categories: ['Major', 'Minor'], completed: false },
+            { id: 'c23', title: 'Foundations in Finance', credits: 3, semester: 'y3f', categories: ['Minor'], completed: false },
+            { id: 'c24', title: 'Innovation & Design Thinking', credits: 3, semester: 'y3f', categories: ['Minor'], completed: false },
+            { id: 'c25', title: 'Theology 2', credits: 3, semester: 'y3f', categories: ['Univ'], completed: false },
+            { id: 'c26', title: 'Free Elective', credits: 3, semester: 'y3f', categories: ['Elective'], completed: false },
+
+            // Junior Year - Spring (15 credits)
+            { id: 'c27', title: 'Theory of Computing', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
+            { id: 'c28', title: 'CSE Elective 2', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
+            { id: 'c29', title: 'CSE Elective 3', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
+            { id: 'c30', title: 'MGTO Elective', credits: 3, semester: 'y3s', categories: ['Minor'], completed: false },
+            { id: 'c31', title: 'Free Elective', credits: 3, semester: 'y3s', categories: ['Elective'], completed: false },
+
+            // Senior Year - Fall (12 credits)
+            { id: 'c32', title: 'Moreau Part 2', credits: 1, semester: 'y4f', categories: ['Univ'], completed: false },
+            { id: 'c33', title: 'Design & Analysis of Algorithms', credits: 3, semester: 'y4f', categories: ['Major'], completed: false },
+            { id: 'c34', title: 'CSE Elective 4', credits: 3, semester: 'y4f', categories: ['Major'], completed: false },
+            { id: 'c35', title: 'Foundations in Accountancy', credits: 3, semester: 'y4f', categories: ['Minor'], completed: false },
+            { id: 'c36', title: 'MGTO Elective', credits: 2, semester: 'y4f', categories: ['Minor'], completed: false },
+
+            // Senior Year - Spring (13 credits)
+            { id: 'c37', title: 'Ethical & Professional Issues', credits: 3, semester: 'y4s', categories: ['Major'], completed: false },
+            { id: 'c38', title: 'CSE Elective 5', credits: 3, semester: 'y4s', categories: ['Major'], completed: false },
+            { id: 'c39', title: 'MGTO Capstone', credits: 3, semester: 'y4s', categories: ['Minor'], completed: false },
+            { id: 'c40', title: 'Free Elective', credits: 4, semester: 'y4s', categories: ['Elective'], completed: false }
+        ];
+
+        let courses = [];
+        let transferCredits = 8;
+        let draggedCourseId = null;
+
+        function showToast(msg) {
+            const toast = document.getElementById('notificationToast');
+            const toastMsg = document.getElementById('notificationMessage');
+            if (toast && toastMsg) {
+                toastMsg.textContent = msg;
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+        }
+
+        function cleanLeadingLabel(title) {
+            if (!title) return '';
+            return title.replace(/^(Univ:|Major:|Minor:|A&L:|A&L\/Minor:|Major\/Minor:)\s*/i, '').trim();
+        }
+
+        function normalizeCategories(c) {
+            c.title = cleanLeadingLabel(c.title);
+            if (!c.categories) {
+                if (c.category) {
+                    if (c.category === 'A&L/Minor' || c.category === 'A&L / Minor') c.categories = ['A&L', 'Minor'];
+                    else if (c.category === 'Major/Minor') c.categories = ['Major', 'Minor'];
+                    else c.categories = [c.category];
+                } else {
+                    c.categories = ['Univ'];
+                }
+            }
+            if (!Array.isArray(c.categories)) c.categories = [c.categories];
+            delete c.category;
+            return c;
+        }
+
+        function initData() {
+            const saved = localStorage.getItem('nd_four_year_plan_quad');
+            const savedTransfer = localStorage.getItem('nd_transfer_credits');
+            
+            if (savedTransfer !== null) {
+                transferCredits = parseFloat(savedTransfer) || 0;
+            } else {
+                transferCredits = 8;
+            }
+
+            const transferInput = document.getElementById('transferCreditsInput');
+            if (transferInput) transferInput.value = transferCredits;
+
+            if (saved) {
+                try {
+                    courses = JSON.parse(saved);
+                    courses.forEach(normalizeCategories);
+                } catch(e) {
+                    courses = defaultCourses.map(c => normalizeCategories({...c}));
+                }
+            } else {
+                courses = defaultCourses.map(c => normalizeCategories({...c}));
+            }
+            saveState();
+            renderAll();
+        }
+
+        function saveState() {
+            localStorage.setItem('nd_four_year_plan_quad', JSON.stringify(courses));
+            localStorage.setItem('nd_transfer_credits', transferCredits.toString());
+        }
+
+        function updateTransferCredits(val) {
+            const num = parseFloat(val);
+            transferCredits = isNaN(num) || num < 0 ? 0 : num;
+            saveState();
+            updateCreditTotals();
+        }
+
+        function getCategoryBadgeClass(category) {
+            switch(category) {
+                case 'Univ': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
+                case 'Major': return 'bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-200 font-bold';
+                case 'Minor': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300';
+                case 'A&L': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300';
+                default: return 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300';
+            }
+        }
+
+        function renderAll() {
+            const semesterLists = document.querySelectorAll('.course-list');
+            semesterLists.forEach(list => list.innerHTML = '');
+
+            const filterCategory = document.getElementById('categoryFilter')?.value || 'ALL';
+            const searchQuery = document.getElementById('searchInput')?.value.toLowerCase() || '';
+
+            courses.forEach(course => {
+                const cats = course.categories || [];
+                if (filterCategory !== 'ALL' && !cats.includes(filterCategory)) return;
+                if (searchQuery && !course.title.toLowerCase().includes(searchQuery)) return;
+
+                const card = createCourseCard(course);
+                const targetList = document.querySelector(`.course-list[data-semester="${course.semester}"]`);
+                if (targetList) {
+                    targetList.appendChild(card);
+                }
+            });
+
+            updateCreditTotals();
+            lucide.createIcons();
+            attachDragAndDropHandlers();
+        }
+
+        function createCourseCard(course) {
+            const card = document.createElement('div');
+            card.className = `course-card p-2.5 rounded-lg border shadow-xs transition-all duration-150 bg-white dark:bg-slate-700/80 cursor-grab active:cursor-grabbing border-slate-200 dark:border-slate-600 hover:border-ndGold-400 dark:hover:border-ndGold-400 ${course.completed ? 'ring-1 ring-green-500/50 bg-green-50/20 dark:bg-green-950/20' : ''}`;
+            card.setAttribute('draggable', 'true');
+            card.setAttribute('data-id', course.id);
+
+            const badgesHtml = (course.categories || ['Univ']).map(cat => 
+                `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${getCategoryBadgeClass(cat)}">${cat}</span>`
+            ).join(' ');
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between gap-2 min-w-0">
+                    <div class="flex-grow min-w-0 overflow-hidden">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <span class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 truncate whitespace-nowrap block" title="${course.title}">${course.title}</span>
+                            ${course.completed ? `<span class="inline-flex items-center text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-1 py-0.2 rounded shrink-0" title="Completed"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                            ${badgesHtml}
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-bold ml-0.5 shrink-0">${course.credits} cr</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-1 no-print shrink-0">
+                        <button onclick="toggleCourseCompleted('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition" title="Toggle Completed">
+                            <i data-lucide="${course.completed ? 'check-circle-2' : 'circle'}" class="w-4 h-4 ${course.completed ? 'text-green-600 dark:text-green-400 fill-green-100 dark:fill-green-950' : ''}"></i>
+                        </button>
+                        <button onclick="openMoveModal('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-amber-500 transition sm:hidden" title="Move Course">
+                            <i data-lucide="arrow-right-left" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="openEditModal('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-blue-500 transition" title="Edit Course">
+                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="window.removeCourse('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-red-500 transition" title="Delete Course">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function updateCreditTotals() {
+            const semesters = ['y1f', 'y1s', 'y2f', 'y2s', 'y3f', 'y3s', 'y4f', 'y4s'];
+            let totalPlanned = 0;
+            let totalCompleted = 0;
+            const semesterTotals = {};
+
+            semesters.forEach(sem => {
+                const semCourses = courses.filter(c => c.semester === sem);
+                const sum = semCourses.reduce((acc, c) => acc + (parseFloat(c.credits) || 0), 0);
+                semesterTotals[sem] = sum;
+                totalPlanned += sum;
+
+                semCourses.filter(c => c.completed).forEach(c => totalCompleted += (parseFloat(c.credits) || 0));
+
+                const semBoxHeader = document.querySelector(`.semester-box[data-semester="${sem}"] .semester-credits`);
+                if (semBoxHeader) {
+                    semBoxHeader.textContent = `(${sum} credits)`;
+                }
+            });
+
+            document.getElementById('year1TotalCredits').textContent = `${(semesterTotals.y1f + semesterTotals.y1s)} Cr`;
+            document.getElementById('year2TotalCredits').textContent = `${(semesterTotals.y2f + semesterTotals.y2s)} Cr`;
+            document.getElementById('year3TotalCredits').textContent = `${(semesterTotals.y3f + semesterTotals.y3s)} Cr`;
+            document.getElementById('year4TotalCredits').textContent = `${(semesterTotals.y4f + semesterTotals.y4s)} Cr`;
+
+            document.getElementById('statTotalPlanned').textContent = totalPlanned;
+            document.getElementById('statCompleted').textContent = totalCompleted;
+            
+            const totalWithIB = totalPlanned + transferCredits;
+            document.getElementById('statWithIB').textContent = totalWithIB;
+
+            document.getElementById('formulaCalculated').textContent = totalPlanned;
+            document.getElementById('formulaTransferCount').textContent = transferCredits;
+            document.getElementById('formulaWithIB').textContent = totalWithIB;
+        }
+
+        function attachDragAndDropHandlers() {
+            const cards = document.querySelectorAll('.course-card');
+            const lists = document.querySelectorAll('.course-list');
+
+            cards.forEach(card => {
+                card.addEventListener('dragstart', (e) => {
+                    draggedCourseId = card.getAttribute('data-id');
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    draggedCourseId = null;
+                    document.querySelectorAll('.course-list').forEach(l => l.classList.remove('drag-over'));
+                    document.querySelectorAll('.course-card').forEach(c => c.classList.remove('drop-target-before', 'drop-target-after'));
+                });
+
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!draggedCourseId) return;
+
+                    const draggingCard = document.querySelector(`.course-card[data-id="${draggedCourseId}"]`);
+                    if (draggingCard === card) return;
+
+                    const rect = card.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    card.classList.remove('drop-target-before', 'drop-target-after');
+
+                    if (e.clientY < midY) {
+                        card.classList.add('drop-target-before');
+                    } else {
+                        card.classList.add('drop-target-after');
+                    }
+                });
+
+                card.addEventListener('dragleave', () => {
+                    card.classList.remove('drop-target-before', 'drop-target-after');
+                });
+
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!draggedCourseId) return;
+
+                    const targetSemester = card.closest('.course-list').getAttribute('data-semester');
+                    const draggedIdx = courses.findIndex(c => c.id === draggedCourseId);
+                    const targetIdx = courses.findIndex(c => c.id === card.getAttribute('data-id'));
+
+                    if (draggedIdx !== -1 && targetIdx !== -1) {
+                        const [movedCourse] = courses.splice(draggedIdx, 1);
+                        movedCourse.semester = targetSemester;
+
+                        const rect = card.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        const insertPos = e.clientY < midY ? targetIdx : targetIdx + 1;
+
+                        courses.splice(insertPos > draggedIdx ? insertPos - 1 : insertPos, 0, movedCourse);
+                        saveState();
+                        renderAll();
+                    }
+                });
+            });
+
+            lists.forEach(list => {
+                list.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    list.classList.add('drag-over');
+                });
+
+                list.addEventListener('dragleave', () => {
+                    list.classList.remove('drag-over');
+                });
+
+                list.addEventListener('drop', (e) => {
+                    if (e.target.closest('.course-card')) return;
+                    e.preventDefault();
+                    list.classList.remove('drag-over');
+                    const newSemester = list.getAttribute('data-semester');
+                    
+                    if (draggedCourseId) {
+                        const course = courses.find(c => c.id === draggedCourseId);
+                        if (course && course.semester !== newSemester) {
+                            course.semester = newSemester;
+                            saveState();
+                            renderAll();
+                        }
+                    }
+                });
+            });
+        }
+
+        window.removeCourse = function(id, event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            courses = courses.filter(c => c.id !== id);
+            saveState();
+            renderAll();
+            showToast('Course removed.');
+        };
+
+        function toggleCourseCompleted(id, event) {
+            if (event) event.stopPropagation();
+            const course = courses.find(c => c.id === id);
+            if (course) {
+                course.completed = !course.completed;
+                saveState();
+                renderAll();
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Course';
+            document.getElementById('courseId').value = '';
+            document.getElementById('courseTitle').value = '';
+            document.getElementById('courseCredits').value = '3';
+            document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
+            const firstCb = document.querySelector('.category-checkbox[value="Univ"]');
+            if (firstCb) firstCb.checked = true;
+            document.getElementById('courseSemester').value = 'y1f';
+            document.getElementById('courseCompleted').checked = false;
+            document.getElementById('courseModal').classList.remove('hidden');
+        }
+
+        function openEditModal(id, event) {
+            if (event) event.stopPropagation();
+            const course = courses.find(c => c.id === id);
+            if (!course) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Course';
+            document.getElementById('courseId').value = course.id;
+            document.getElementById('courseTitle').value = course.title;
+            document.getElementById('courseCredits').value = course.credits;
+            
+            const cats = course.categories || ['Univ'];
+            document.querySelectorAll('.category-checkbox').forEach(cb => {
+                cb.checked = cats.includes(cb.value);
+            });
+
+            document.getElementById('courseSemester').value = course.semester;
+            document.getElementById('courseCompleted').checked = course.completed || false;
+            document.getElementById('courseModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('courseModal').classList.add('hidden');
+        }
+
+        function saveCourse(e) {
+            e.preventDefault();
+            const id = document.getElementById('courseId').value;
+            const rawTitle = document.getElementById('courseTitle').value.trim();
+            const title = cleanLeadingLabel(rawTitle);
+            const credits = parseFloat(document.getElementById('courseCredits').value) || 0;
+            
+            const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value);
+            const categories = selectedCategories.length > 0 ? selectedCategories : ['Univ'];
+
+            const semester = document.getElementById('courseSemester').value;
+            const completed = document.getElementById('courseCompleted').checked;
+
+            if (id) {
+                const course = courses.find(c => c.id === id);
+                if (course) {
+                    course.title = title;
+                    course.credits = credits;
+                    course.categories = categories;
+                    course.semester = semester;
+                    course.completed = completed;
+                }
+            } else {
+                courses.push({
+                    id: 'c_' + Date.now(),
+                    title,
+                    credits,
+                    categories,
+                    semester,
+                    completed
+                });
+            }
+
+            saveState();
+            closeModal();
+            renderAll();
+            showToast(id ? 'Course updated.' : 'Course added successfully.');
+        }
+
+        function openMoveModal(id, event) {
+            if (event) event.stopPropagation();
+            const course = courses.find(c => c.id === id);
+            if (!course) return;
+
+            document.getElementById('moveCourseId').value = course.id;
+            document.getElementById('moveCourseTitle').textContent = course.title;
+            document.getElementById('targetSemesterSelect').value = course.semester;
+            document.getElementById('moveModal').classList.remove('hidden');
+        }
+
+        function closeMoveModal() {
+            document.getElementById('moveModal').classList.add('hidden');
+        }
+
+        function confirmMoveCourse() {
+            const id = document.getElementById('moveCourseId').value;
+            const targetSem = document.getElementById('targetSemesterSelect').value;
+            const course = courses.find(c => c.id === id);
+            if (course) {
+                course.semester = targetSem;
+                saveState();
+                renderAll();
+            }
+            closeMoveModal();
+            showToast('Course moved.');
+        }
+
+        function exportData() {
+            const exportPayload = {
+                transferCredits: transferCredits,
+                courses: courses
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "Academic_Four_Year_Plan_Quadrant.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Plan JSON exported.');
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        courses = imported.map(c => normalizeCategories({...c}));
+                        transferCredits = 8;
+                    } else if (imported && Array.isArray(imported.courses)) {
+                        courses = imported.courses.map(c => normalizeCategories({...c}));
+                        transferCredits = typeof imported.transferCredits === 'number' ? imported.transferCredits : 8;
+                    }
+                    const transferInput = document.getElementById('transferCreditsInput');
+                    if (transferInput) transferInput.value = transferCredits;
+
+                    saveState();
+                    renderAll();
+                    showToast('Plan imported successfully.');
+                } catch(err) {
+                    showToast('Error: Invalid JSON file format.');
+                }
+            };
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0]);
+            }
+        }
+
+        function resetToDefaultPlan() {
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal(confirmed) {
+            document.getElementById('confirmModal').classList.add('hidden');
+            if (confirmed) {
+                courses = defaultCourses.map(c => normalizeCategories({...c}));
+                transferCredits = 8;
+                const transferInput = document.getElementById('transferCreditsInput');
+                if (transferInput) transferInput.value = 8;
+                saveState();
+                renderAll();
+                showToast('Reset to default plan template.');
+            }
+        }
+
+        function filterCourses() {
+            renderAll();
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initData();
+        });
+    </script>
+</body>
+</html>
