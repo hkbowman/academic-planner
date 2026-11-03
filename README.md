@@ -1,5 +1,7 @@
 # academic-planner
-4 Year Academic Planner - Notre Dame CSBA
+4 Year Academic Planner - 
+Notre Dame CSBA with minors in Business Economics (A&L) and Innovation and Entrepreneurship (Mendoza)
+
 This is an interactive planner used for long term planning of college courses to ensure all requirements are met. Key functionality includes:
 * add/delete/modify courses
 * drag courses and drop courses within and between semesters
