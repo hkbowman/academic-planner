@@ -1,27 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
-
-  // Your web app's Firebase configuration (without analytics)
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTkSL7odr6ck6wspa7HmcCi4ii--rKT3Q",
-    authDomain: "academic-planner-10ba9.firebaseapp.com",
-    projectId: "academic-planner-10ba9",
-    storageBucket: "academic-planner-10ba9.firebasestorage.app",
-    messagingSenderId: "283906050121",
-    appId: "1:283906050121:web:7b69a8325aa22017ff5798"
-  };
-
-  // Initialize Firebase and Firestore
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  console.log("Connected to Firestore database successfully!");
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academic Plan Planner - 2x2 Quadrant Layout</title>
@@ -76,7 +55,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
 
-    <!-- Custom Notification Box (Replaces Alert) -->
+    <!-- Custom Notification Box -->
     <div id="notificationToast" class="fixed bottom-4 right-4 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
         <i data-lucide="info" class="w-4 h-4 text-ndGold-400 dark:text-ndNavy-700"></i>
         <span id="notificationMessage" class="text-xs font-semibold">Notification message</span>
@@ -121,9 +100,8 @@
     <!-- Main Container -->
     <main class="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
 
-        <!-- Top Overview Stats Bar (Strict Order: Planned Credits, With IB/AP Transfer, Completed) -->
+        <!-- Top Overview Stats Bar -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <!-- 1. Planned Credits -->
             <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
                 <div class="p-2.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg">
                     <i data-lucide="book-open" class="w-5 h-5"></i>
@@ -134,7 +112,6 @@
                 </div>
             </div>
 
-            <!-- 2. With IB/AP Transfer -->
             <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
                 <div class="p-2.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg">
                     <i data-lucide="award" class="w-5 h-5"></i>
@@ -145,7 +122,6 @@
                 </div>
             </div>
 
-            <!-- 3. Completed -->
             <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
                 <div class="p-2.5 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-lg">
                     <i data-lucide="check-circle-2" class="w-5 h-5"></i>
@@ -181,98 +157,90 @@
         <!-- Academic Plan Layout (2x2 Quadrants) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5" id="yearsContainer">
             
-            <!-- Quadrant 1: Top-Left (First Year) -->
+            <!-- Quadrant 1: First Year -->
             <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
                 <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">First Year</h2>
-                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year1TotalCredits">34 Cr</span>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year1TotalCredits">0 Cr</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
-                    <!-- Fall Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y1f">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(17 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y1f"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y1f" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
-                    <!-- Spring Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y1s">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(17 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y1s"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y1s" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quadrant 2: Top-Right (Sophomore Year) -->
+            <!-- Quadrant 2: Sophomore Year -->
             <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
                 <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">Sophomore Year</h2>
-                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year2TotalCredits">31 Cr</span>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year2TotalCredits">0 Cr</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
-                    <!-- Fall Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y2f">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(16 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y2f"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y2f" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
-                    <!-- Spring Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y2s">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(15 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y2s"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y2s" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quadrant 3: Bottom-Left (Junior Year) -->
+            <!-- Quadrant 3: Junior Year -->
             <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
                 <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">Junior Year</h2>
-                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year3TotalCredits">30 Cr</span>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year3TotalCredits">0 Cr</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
-                    <!-- Fall Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y3f">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(15 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y3f"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y3f" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
-                    <!-- Spring Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y3s">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(15 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y3s"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y3s" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quadrant 4: Bottom-Right (Senior Year) -->
+            <!-- Quadrant 4: Senior Year -->
             <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm p-4 flex flex-col h-full">
                 <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex justify-between items-baseline">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white no-underline">Senior Year</h2>
-                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year4TotalCredits">25 Cr</span>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-md" id="year4TotalCredits">0 Cr</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
-                    <!-- Fall Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y4f">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(12 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Fall <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y4f"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y4f" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
-                    <!-- Spring Semester -->
                     <div class="semester-box bg-slate-50/80 dark:bg-slate-900/40 rounded-lg border border-slate-200 dark:border-slate-700 p-3 flex flex-col" data-semester="y4s">
                         <div class="flex justify-between items-center mb-2.5 pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(13 credits)</span></h3>
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 text-sm tracking-wide">Spring <span class="semester-credits text-slate-500 dark:text-slate-400 font-semibold text-xs ml-1">(0 credits)</span></h3>
                         </div>
-                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y4s"></div>
+                        <div class="course-list space-y-2 min-h-[160px] flex-grow" data-semester="y4s" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropCourse(event)"></div>
                     </div>
                 </div>
             </div>
@@ -324,7 +292,7 @@
                 <h3 id="modalTitle" class="font-bold text-sm">Add New Course</h3>
                 <button onclick="closeModal()" class="text-slate-300 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <form id="courseForm" onsubmit="saveCourse(event)" class="p-5 space-y-3">
+            <form id="courseForm" onsubmit="handleFormSubmit(event)" class="p-5 space-y-3">
                 <input type="hidden" id="courseId">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase mb-1">Course Title</label>
@@ -379,7 +347,7 @@
         </div>
     </div>
 
-    <!-- Move Course Quick Modal (Mobile support) -->
+    <!-- Move Course Quick Modal -->
     <div id="moveModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50 no-print">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-xs overflow-hidden p-5 space-y-3">
             <h3 class="font-bold text-sm text-slate-900 dark:text-white">Move Course To...</h3>
@@ -402,14 +370,14 @@
         </div>
     </div>
 
-    <!-- Confirmation Dialog Modal (Replaces Confirm) -->
+    <!-- Confirmation Dialog Modal -->
     <div id="confirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50 no-print">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-sm overflow-hidden p-5 space-y-3 text-center">
             <div class="w-10 h-10 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto">
                 <i data-lucide="alert-triangle" class="w-5 h-5"></i>
             </div>
             <h3 class="font-bold text-sm text-slate-900 dark:text-white">Reset Academic Plan?</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Reset to default 4-year curriculum template? Any custom changes will be overwritten.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Reset database to default curriculum template? Any custom changes will be overwritten for both users.</p>
             <div class="flex justify-center gap-2 pt-2">
                 <button onclick="closeConfirmModal(false)" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Cancel</button>
                 <button onclick="closeConfirmModal(true)" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs">Confirm Reset</button>
@@ -417,542 +385,439 @@
         </div>
     </div>
 
-    <!-- Application Logic Script -->
-    <script>
-        const defaultCourses = [
-            // First Year - Fall (17 credits)
-            { id: 'c1', title: 'Writing & Rhetoric', credits: 3, semester: 'y1f', categories: ['Univ'], completed: true },
-            { id: 'c2', title: 'Intro Philosophy', credits: 3, semester: 'y1f', categories: ['Univ'], completed: true },
-            { id: 'c3', title: 'Moreau Part 1', credits: 1, semester: 'y1f', categories: ['Univ'], completed: true },
-            { id: 'c4', title: 'Intro Hispanic Lit & Culture', credits: 3, semester: 'y1f', categories: ['A&L'], completed: true },
-            { id: 'c5', title: 'Microeconomics', credits: 3, semester: 'y1f', categories: ['A&L', 'Minor'], completed: true },
-            { id: 'c6', title: 'Calculus I', credits: 4, semester: 'y1f', categories: ['Major'], completed: true },
+    <!-- Firebase & Application Logic Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
-            // First Year - Spring (17 credits)
-            { id: 'c7', title: 'Theology 1', credits: 3, semester: 'y1s', categories: ['Univ'], completed: true },
-            { id: 'c8', title: 'Univ Seminar / History USEM', credits: 3, semester: 'y1s', categories: ['Univ'], completed: true },
-            { id: 'c9', title: 'Intro to Jazz', credits: 3, semester: 'y1s', categories: ['Univ'], completed: true },
-            { id: 'c10', title: 'Calculus II', credits: 4, semester: 'y1s', categories: ['Major'], completed: true },
-            { id: 'c11', title: 'Fundamentals for Computing', credits: 4, semester: 'y1s', categories: ['Major'], completed: true },
+        // Your Firebase config (without analytics)
+        const firebaseConfig = {
+          apiKey: "AIzaSyBTkSL7odr6ck6wspa7HmcCi4ii--rKT3Q",
+          authDomain: "academic-planner-10ba9.firebaseapp.com",
+          projectId: "academic-planner-10ba9",
+          storageBucket: "academic-planner-10ba9.firebasestorage.app",
+          messagingSenderId: "283906050121",
+          appId: "1:283906050121:web:7b69a8325aa22017ff5798"
+        };
 
-            // Sophomore Year - Fall (16 credits)
-            { id: 'c12', title: 'Elementary Cosmology', credits: 3, semester: 'y2f', categories: ['Univ'], completed: false },
-            { id: 'c13', title: 'Calculus III', credits: 3.5, semester: 'y2f', categories: ['Major'], completed: false },
-            { id: 'c14', title: 'Discrete Mathematics', credits: 3, semester: 'y2f', categories: ['Major'], completed: false },
-            { id: 'c15', title: 'Data Structures', credits: 3.5, semester: 'y2f', categories: ['Major'], completed: false },
-            { id: 'c16', title: 'Human Comp Interaction', credits: 3, semester: 'y2f', categories: ['Major'], completed: false },
-
-            // Sophomore Year - Spring (15 credits)
-            { id: 'c17', title: 'Philosophy 2', credits: 3, semester: 'y2s', categories: ['Univ'], completed: false },
-            { id: 'c18', title: 'Systems Programming', credits: 3, semester: 'y2s', categories: ['Major'], completed: false },
-            { id: 'c19', title: 'College Seminar CSEM', credits: 3, semester: 'y2s', categories: ['A&L', 'Univ'], completed: false },
-            { id: 'c20', title: 'Macroeconomics', credits: 3, semester: 'y2s', categories: ['Minor'], completed: false },
-            { id: 'c21', title: 'Essentials in Innovation', credits: 3, semester: 'y2s', categories: ['Minor'], completed: false },
-
-            // Junior Year - Fall (15 credits)
-            { id: 'c22', title: 'Probability and Statistics', credits: 3, semester: 'y3f', categories: ['Major', 'Minor'], completed: false },
-            { id: 'c23', title: 'Foundations in Finance', credits: 3, semester: 'y3f', categories: ['Minor'], completed: false },
-            { id: 'c24', title: 'Innovation & Design Thinking', credits: 3, semester: 'y3f', categories: ['Minor'], completed: false },
-            { id: 'c25', title: 'Theology 2', credits: 3, semester: 'y3f', categories: ['Univ'], completed: false },
-            { id: 'c26', title: 'Free Elective', credits: 3, semester: 'y3f', categories: ['Elective'], completed: false },
-
-            // Junior Year - Spring (15 credits)
-            { id: 'c27', title: 'Theory of Computing', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
-            { id: 'c28', title: 'CSE Elective 2', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
-            { id: 'c29', title: 'CSE Elective 3', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
-            { id: 'c30', title: 'MGTO Elective', credits: 3, semester: 'y3s', categories: ['Minor'], completed: false },
-            { id: 'c31', title: 'Free Elective', credits: 3, semester: 'y3s', categories: ['Elective'], completed: false },
-
-            // Senior Year - Fall (12 credits)
-            { id: 'c32', title: 'Moreau Part 2', credits: 1, semester: 'y4f', categories: ['Univ'], completed: false },
-            { id: 'c33', title: 'Design & Analysis of Algorithms', credits: 3, semester: 'y4f', categories: ['Major'], completed: false },
-            { id: 'c34', title: 'CSE Elective 4', credits: 3, semester: 'y4f', categories: ['Major'], completed: false },
-            { id: 'c35', title: 'Foundations in Accountancy', credits: 3, semester: 'y4f', categories: ['Minor'], completed: false },
-            { id: 'c36', title: 'MGTO Elective', credits: 2, semester: 'y4f', categories: ['Minor'], completed: false },
-
-            // Senior Year - Spring (13 credits)
-            { id: 'c37', title: 'Ethical & Professional Issues', credits: 3, semester: 'y4s', categories: ['Major'], completed: false },
-            { id: 'c38', title: 'CSE Elective 5', credits: 3, semester: 'y4s', categories: ['Major'], completed: false },
-            { id: 'c39', title: 'MGTO Capstone', credits: 3, semester: 'y4s', categories: ['Minor'], completed: false },
-            { id: 'c40', title: 'Free Elective', credits: 4, semester: 'y4s', categories: ['Elective'], completed: false }
-        ];
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         let courses = [];
         let transferCredits = 8;
-        let draggedCourseId = null;
+        let confirmCallback = null;
 
-        function showToast(msg) {
-            const toast = document.getElementById('notificationToast');
-            const toastMsg = document.getElementById('notificationMessage');
-            if (toast && toastMsg) {
-                toastMsg.textContent = msg;
-                toast.classList.remove('translate-y-20', 'opacity-0');
-                setTimeout(() => {
-                    toast.classList.add('translate-y-20', 'opacity-0');
-                }, 3000);
+        const defaultCourses = [
+            { title: 'Writing & Rhetoric', credits: 3, semester: 'y1f', categories: ['Univ'], completed: true },
+            { title: 'Intro Philosophy', credits: 3, semester: 'y1f', categories: ['Univ'], completed: true },
+            { title: 'Moreau Part 1', credits: 1, semester: 'y1f', categories: ['Univ'], completed: true },
+            { title: 'Intro Hispanic Lit & Culture', credits: 3, semester: 'y1f', categories: ['A&L'], completed: true },
+            { title: 'Calculus I', credits: 4, semester: 'y1f', categories: ['Major'], completed: true },
+            { title: 'Fundamentals of Computing', credits: 3, semester: 'y1f', categories: ['Major'], completed: true },
+
+            { title: 'General Chemistry I', credits: 3, semester: 'y1s', categories: ['Univ'], completed: false },
+            { title: 'Moreau Part 2', credits: 1, semester: 'y1s', categories: ['Univ'], completed: false },
+            { title: 'Calculus II', credits: 4, semester: 'y1s', categories: ['Major'], completed: false },
+            { title: 'Discrete Mathematics', credits: 3, semester: 'y1s', categories: ['Major'], completed: false },
+            { title: 'Object-Oriented Programming', credits: 3, semester: 'y1s', categories: ['Major'], completed: false },
+            { title: 'Principles of Microeconomics', credits: 3, semester: 'y1s', categories: ['Minor'], completed: false },
+
+            { title: 'Data Structures', credits: 3, semester: 'y2f', categories: ['Major'], completed: false },
+            { title: 'Computer Architecture', credits: 3, semester: 'y2f', categories: ['Major'], completed: false },
+            { title: 'Principles of Macroeconomics', credits: 3, semester: 'y2f', categories: ['Minor'], completed: false },
+            { title: 'Financial Accounting', credits: 3, semester: 'y2f', categories: ['Minor'], completed: false },
+            { title: 'University Seminar', credits: 3, semester: 'y2f', categories: ['Univ'], completed: false },
+            { title: 'Spirituality of Notre Dame', credits: 1, semester: 'y2f', categories: ['Univ'], completed: false },
+
+            { title: 'Algorithms', credits: 3, semester: 'y2s', categories: ['Major'], completed: false },
+            { title: 'Systems Programming', credits: 3, semester: 'y2s', categories: ['Major'], completed: false },
+            { title: 'Managerial Economics', credits: 3, semester: 'y2s', categories: ['Minor'], completed: false },
+            { title: 'Innovation & Entrepreneurship', credits: 3, semester: 'y2s', categories: ['Minor'], completed: false },
+            { title: 'A&L Elective', credits: 3, semester: 'y2s', categories: ['A&L'], completed: false },
+
+            { title: 'Operating Systems', credits: 3, semester: 'y3f', categories: ['Major'], completed: false },
+            { title: 'Database Systems', credits: 3, semester: 'y3f', categories: ['Major'], completed: false },
+            { title: 'Corporate Finance', credits: 3, semester: 'y3f', categories: ['Minor'], completed: false },
+            { title: 'Venture Capital & PE', credits: 3, semester: 'y3f', categories: ['Minor'], completed: false },
+            { title: 'University Theology', credits: 3, semester: 'y3f', categories: ['Univ'], completed: false },
+
+            { title: 'Software Engineering', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
+            { title: 'Artificial Intelligence', credits: 3, semester: 'y3s', categories: ['Major'], completed: false },
+            { title: 'New Venture Launch', credits: 3, semester: 'y3s', categories: ['Minor'], completed: false },
+            { title: 'Marketing Strategy', credits: 3, semester: 'y3s', categories: ['Minor'], completed: false },
+            { title: 'University Ethics', credits: 3, semester: 'y3s', categories: ['Univ'], completed: false },
+
+            { title: 'Senior Design Project I', credits: 3, semester: 'y4f', categories: ['Major'], completed: false },
+            { title: 'Cybersecurity', credits: 3, semester: 'y4f', categories: ['Major'], completed: false },
+            { title: 'Tech Startup Strategy', credits: 3, semester: 'y4f', categories: ['Minor'], completed: false },
+            { title: 'Free Elective', credits: 3, semester: 'y4f', categories: ['Elective'], completed: false },
+
+            { title: 'Senior Design Project II', credits: 3, semester: 'y4s', categories: ['Major'], completed: false },
+            { title: 'Distributed Systems', credits: 3, semester: 'y4s', categories: ['Major'], completed: false },
+            { title: 'Global Business Economics', credits: 3, semester: 'y4s', categories: ['Minor'], completed: false },
+            { title: 'Free Elective', credits: 4, semester: 'y4s', categories: ['Elective'], completed: false }
+        ];
+
+        // 1. Real-time synchronization from Firestore
+        onSnapshot(collection(db, "courses"), async (snapshot) => {
+            courses = [];
+            snapshot.forEach((docSnap) => {
+                courses.push({ id: docSnap.id, ...docSnap.data() });
+            });
+
+            // If database is empty, seed with default curriculum automatically
+            if (courses.length === 0) {
+                for (let c of defaultCourses) {
+                    await addDoc(collection(db, "courses"), c);
+                }
+                return;
             }
-        }
 
-        function cleanLeadingLabel(title) {
-            if (!title) return '';
-            return title.replace(/^(Univ:|Major:|Minor:|A&L:|A&L\/Minor:|Major\/Minor:)\s*/i, '').trim();
-        }
+            renderCourses();
+            updateStats();
+            lucide.createIcons();
+        });
 
-        function normalizeCategories(c) {
-            c.title = cleanLeadingLabel(c.title);
-            if (!c.categories) {
-                if (c.category) {
-                    if (c.category === 'A&L/Minor' || c.category === 'A&L / Minor') c.categories = ['A&L', 'Minor'];
-                    else if (c.category === 'Major/Minor') c.categories = ['Major', 'Minor'];
-                    else c.categories = [c.category];
+        // Listen for Transfer Credits Sync
+        onSnapshot(collection(db, "settings"), (snapshot) => {
+            snapshot.forEach((docSnap) => {
+                if (docSnap.id === "config" && docSnap.data().transferCredits !== undefined) {
+                    transferCredits = docSnap.data().transferCredits;
+                    const inputEl = document.getElementById("transferCreditsInput");
+                    if (inputEl && document.activeElement !== inputEl) {
+                        inputEl.value = transferCredits;
+                    }
+                    updateStats();
+                }
+            });
+        });
+
+        // Expose handlers globally
+        window.handleFormSubmit = async function(event) {
+            event.preventDefault();
+            const id = document.getElementById('courseId').value;
+            const title = document.getElementById('courseTitle').value;
+            const credits = parseFloat(document.getElementById('courseCredits').value);
+            const semester = document.getElementById('courseSemester').value;
+            const completed = document.getElementById('courseCompleted').checked;
+
+            const checkboxes = document.querySelectorAll('.category-checkbox');
+            const categories = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) categories.push(cb.value);
+            });
+            if (categories.length === 0) categories.push('Elective');
+
+            const courseData = { title, credits, semester, categories, completed };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, "courses", id), courseData);
+                    showNotification("Course updated successfully");
                 } else {
-                    c.categories = ['Univ'];
+                    await addDoc(collection(db, "courses"), courseData);
+                    showNotification("Course added successfully");
                 }
+                closeModal();
+            } catch (e) {
+                console.error("Error saving course:", e);
             }
-            if (!Array.isArray(c.categories)) c.categories = [c.categories];
-            delete c.category;
-            return c;
-        }
+        };
 
-        function initData() {
-            const saved = localStorage.getItem('nd_four_year_plan_quad');
-            const savedTransfer = localStorage.getItem('nd_transfer_credits');
-            
-            if (savedTransfer !== null) {
-                transferCredits = parseFloat(savedTransfer) || 0;
-            } else {
-                transferCredits = 8;
+        window.deleteCourse = async function(id) {
+            try {
+                await deleteDoc(doc(db, "courses", id));
+                showNotification("Course deleted");
+            } catch (e) {
+                console.error("Error deleting course:", e);
             }
+        };
 
-            const transferInput = document.getElementById('transferCreditsInput');
-            if (transferInput) transferInput.value = transferCredits;
-
-            if (saved) {
+        window.toggleComplete = async function(id) {
+            const course = courses.find(c => c.id === id);
+            if (course) {
                 try {
-                    courses = JSON.parse(saved);
-                    courses.forEach(normalizeCategories);
-                } catch(e) {
-                    courses = defaultCourses.map(c => normalizeCategories({...c}));
+                    await updateDoc(doc(db, "courses", id), { completed: !course.completed });
+                } catch (e) {
+                    console.error("Error toggling status:", e);
                 }
-            } else {
-                courses = defaultCourses.map(c => normalizeCategories({...c}));
             }
-            saveState();
-            renderAll();
-        }
+        };
 
-        function saveState() {
-            localStorage.setItem('nd_four_year_plan_quad', JSON.stringify(courses));
-            localStorage.setItem('nd_transfer_credits', transferCredits.toString());
-        }
-
-        function updateTransferCredits(val) {
-            const num = parseFloat(val);
-            transferCredits = isNaN(num) || num < 0 ? 0 : num;
-            saveState();
-            updateCreditTotals();
-        }
-
-        function getCategoryBadgeClass(category) {
-            switch(category) {
-                case 'Univ': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
-                case 'Major': return 'bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-200 font-bold';
-                case 'Minor': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300';
-                case 'A&L': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300';
-                default: return 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300';
+        window.updateTransferCredits = async function(val) {
+            transferCredits = parseFloat(val) || 0;
+            updateStats();
+            try {
+                await setDoc(doc(db, "settings", "config"), { transferCredits });
+            } catch (e) {
+                console.error("Error saving settings:", e);
             }
-        }
+        };
 
-        function renderAll() {
-            const semesterLists = document.querySelectorAll('.course-list');
-            semesterLists.forEach(list => list.innerHTML = '');
+        window.resetToDefaultPlan = function() {
+            openConfirmModal(async (confirmed) => {
+                if (confirmed) {
+                    try {
+                        // Delete existing
+                        for (let c of courses) {
+                            await deleteDoc(doc(db, "courses", c.id));
+                        }
+                        // Re-add defaults
+                        for (let c of defaultCourses) {
+                            await addDoc(collection(db, "courses"), c);
+                        }
+                        showNotification("Plan reset to default curriculum");
+                    } catch (e) {
+                        console.error("Reset error:", e);
+                    }
+                }
+            });
+        };
 
-            const filterCategory = document.getElementById('categoryFilter')?.value || 'ALL';
-            const searchQuery = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        window.confirmMoveCourse = async function() {
+            const id = document.getElementById('moveCourseId').value;
+            const targetSemester = document.getElementById('targetSemesterSelect').value;
+            try {
+                await updateDoc(doc(db, "courses", id), { semester: targetSemester });
+                closeMoveModal();
+                showNotification("Course moved successfully");
+            } catch (e) {
+                console.error("Error moving course:", e);
+            }
+        };
+
+        // Render & UI Functions
+        function renderCourses() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+
+            document.querySelectorAll('.course-list').forEach(el => el.innerHTML = '');
+
+            const semesterCredits = { y1f: 0, y1s: 0, y2f: 0, y2s: 0, y3f: 0, y3s: 0, y4f: 0, y4s: 0 };
+            const yearCredits = { y1: 0, y2: 0, y3: 0, y4: 0 };
 
             courses.forEach(course => {
-                const cats = course.categories || [];
-                if (filterCategory !== 'ALL' && !cats.includes(filterCategory)) return;
-                if (searchQuery && !course.title.toLowerCase().includes(searchQuery)) return;
+                const matchesSearch = course.title.toLowerCase().includes(searchQuery);
+                const matchesCategory = categoryFilter === 'ALL' || course.categories.includes(categoryFilter);
+                const isDimmed = !(matchesSearch && matchesCategory);
 
-                const card = createCourseCard(course);
-                const targetList = document.querySelector(`.course-list[data-semester="${course.semester}"]`);
-                if (targetList) {
-                    targetList.appendChild(card);
+                semesterCredits[course.semester] = (semesterCredits[course.semester] || 0) + course.credits;
+                const yr = course.semester.substring(0, 2);
+                yearCredits[yr] = (yearCredits[yr] || 0) + course.credits;
+
+                const listEl = document.querySelector(`.course-list[data-semester="${course.semester}"]`);
+                if (listEl) {
+                    listEl.appendChild(createCourseCard(course, isDimmed));
                 }
             });
 
-            updateCreditTotals();
-            lucide.createIcons();
-            attachDragAndDropHandlers();
+            // Update semester credit banners
+            for (const [sem, credits] of Object.entries(semesterCredits)) {
+                const box = document.querySelector(`.semester-box[data-semester="${sem}"] .semester-credits`);
+                if (box) box.textContent = `(${credits} credits)`;
+            }
+
+            // Update year header badges
+            document.getElementById('year1TotalCredits').textContent = `${yearCredits.y1} Cr`;
+            document.getElementById('year2TotalCredits').textContent = `${yearCredits.y2} Cr`;
+            document.getElementById('year3TotalCredits').textContent = `${yearCredits.y3} Cr`;
+            document.getElementById('year4TotalCredits').textContent = `${yearCredits.y4} Cr`;
         }
 
-        function createCourseCard(course) {
+        function createCourseCard(course, isDimmed) {
             const card = document.createElement('div');
-            card.className = `course-card p-2.5 rounded-lg border shadow-xs transition-all duration-150 bg-white dark:bg-slate-700/80 cursor-grab active:cursor-grabbing border-slate-200 dark:border-slate-600 hover:border-ndGold-400 dark:hover:border-ndGold-400 ${course.completed ? 'ring-1 ring-green-500/50 bg-green-50/20 dark:bg-green-950/20' : ''}`;
-            card.setAttribute('draggable', 'true');
-            card.setAttribute('data-id', course.id);
+            card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-lg border shadow-xs flex items-center justify-between gap-2 transition-all ${isDimmed ? 'opacity-30' : 'opacity-100'} ${course.completed ? 'border-green-500/50 bg-green-50/20 dark:bg-green-950/10' : 'border-slate-200 dark:border-slate-700'}`;
+            card.draggable = true;
 
-            const badgesHtml = (course.categories || ['Univ']).map(cat => 
-                `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${getCategoryBadgeClass(cat)}">${cat}</span>`
-            ).join(' ');
+            card.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', course.id);
+                card.classList.add('dragging');
+            });
+            card.addEventListener('dragend', () => card.classList.remove('dragging'));
+
+            let badgesHTML = course.categories.map(cat => {
+                let colorClass = 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300';
+                if (cat === 'Major') colorClass = 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300';
+                if (cat === 'Minor') colorClass = 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300';
+                if (cat === 'Univ') colorClass = 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300';
+                if (cat === 'A&L') colorClass = 'bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300';
+                return `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${colorClass}">${cat}</span>`;
+            }).join('');
 
             card.innerHTML = `
-                <div class="flex items-center justify-between gap-2 min-w-0">
-                    <div class="flex-grow min-w-0 overflow-hidden">
-                        <div class="flex items-center gap-1.5 min-w-0">
-                            <span class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 truncate whitespace-nowrap block" title="${course.title}">${course.title}</span>
-                            ${course.completed ? `<span class="inline-flex items-center text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-1 py-0.2 rounded shrink-0" title="Completed"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>` : ''}
-                        </div>
-                        <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                            ${badgesHtml}
-                            <span class="text-xs text-slate-500 dark:text-slate-400 font-bold ml-0.5 shrink-0">${course.credits} cr</span>
+                <div class="flex items-center gap-2 overflow-hidden flex-grow">
+                    <button onclick="toggleComplete('${course.id}')" class="text-slate-400 hover:text-green-600 dark:hover:text-green-400 flex-shrink-0">
+                        <i data-lucide="${course.completed ? 'check-circle-2' : 'circle'}" class="w-4 h-4 ${course.completed ? 'text-green-600 dark:text-green-400 fill-green-100 dark:fill-green-950' : ''}"></i>
+                    </button>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-slate-900 dark:text-white truncate ${course.completed ? 'line-through text-slate-400 dark:text-slate-500' : ''}">${course.title}</div>
+                        <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                            <span class="text-[10px] font-semibold text-slate-500">${course.credits} Cr</span>
+                            ${badgesHTML}
                         </div>
                     </div>
-                    
-                    <div class="flex items-center gap-1 no-print shrink-0">
-                        <button onclick="toggleCourseCompleted('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition" title="Toggle Completed">
-                            <i data-lucide="${course.completed ? 'check-circle-2' : 'circle'}" class="w-4 h-4 ${course.completed ? 'text-green-600 dark:text-green-400 fill-green-100 dark:fill-green-950' : ''}"></i>
-                        </button>
-                        <button onclick="openMoveModal('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-amber-500 transition sm:hidden" title="Move Course">
-                            <i data-lucide="arrow-right-left" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <button onclick="openEditModal('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-blue-500 transition" title="Edit Course">
-                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <button onclick="window.removeCourse('${course.id}', event)" class="p-0.5 rounded text-slate-400 hover:text-red-500 transition" title="Delete Course">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
-                    </div>
+                </div>
+                <div class="flex items-center gap-1 flex-shrink-0">
+                    <button onclick="openMoveModal('${course.id}', '${course.title.replace(/'/g, "\\'")}')" class="p-1 text-slate-400 hover:text-ndNavy-700 dark:hover:text-ndGold-400 sm:hidden" title="Move">
+                        <i data-lucide="move" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="openEditModal('${course.id}')" class="p-1 text-slate-400 hover:text-blue-600" title="Edit">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="deleteCourse('${course.id}')" class="p-1 text-slate-400 hover:text-red-600" title="Delete">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
                 </div>
             `;
             return card;
         }
 
-        function updateCreditTotals() {
-            const semesters = ['y1f', 'y1s', 'y2f', 'y2s', 'y3f', 'y3s', 'y4f', 'y4s'];
+        function updateStats() {
             let totalPlanned = 0;
-            let totalCompleted = 0;
-            const semesterTotals = {};
+            let completedCount = 0;
 
-            semesters.forEach(sem => {
-                const semCourses = courses.filter(c => c.semester === sem);
-                const sum = semCourses.reduce((acc, c) => acc + (parseFloat(c.credits) || 0), 0);
-                semesterTotals[sem] = sum;
-                totalPlanned += sum;
-
-                semCourses.filter(c => c.completed).forEach(c => totalCompleted += (parseFloat(c.credits) || 0));
-
-                const semBoxHeader = document.querySelector(`.semester-box[data-semester="${sem}"] .semester-credits`);
-                if (semBoxHeader) {
-                    semBoxHeader.textContent = `(${sum} credits)`;
-                }
+            courses.forEach(c => {
+                totalPlanned += c.credits;
+                if (c.completed) completedCount += c.credits;
             });
 
-            document.getElementById('year1TotalCredits').textContent = `${(semesterTotals.y1f + semesterTotals.y1s)} Cr`;
-            document.getElementById('year2TotalCredits').textContent = `${(semesterTotals.y2f + semesterTotals.y2s)} Cr`;
-            document.getElementById('year3TotalCredits').textContent = `${(semesterTotals.y3f + semesterTotals.y3s)} Cr`;
-            document.getElementById('year4TotalCredits').textContent = `${(semesterTotals.y4f + semesterTotals.y4s)} Cr`;
+            const withIB = totalPlanned + transferCredits;
 
             document.getElementById('statTotalPlanned').textContent = totalPlanned;
-            document.getElementById('statCompleted').textContent = totalCompleted;
-            
-            const totalWithIB = totalPlanned + transferCredits;
-            document.getElementById('statWithIB').textContent = totalWithIB;
+            document.getElementById('statWithIB').textContent = withIB;
+            document.getElementById('statCompleted').textContent = completedCount;
 
             document.getElementById('formulaCalculated').textContent = totalPlanned;
             document.getElementById('formulaTransferCount').textContent = transferCredits;
-            document.getElementById('formulaWithIB').textContent = totalWithIB;
+            document.getElementById('formulaWithIB').textContent = withIB;
         }
 
-        function attachDragAndDropHandlers() {
-            const cards = document.querySelectorAll('.course-card');
-            const lists = document.querySelectorAll('.course-list');
-
-            cards.forEach(card => {
-                card.addEventListener('dragstart', (e) => {
-                    draggedCourseId = card.getAttribute('data-id');
-                    card.classList.add('dragging');
-                    e.dataTransfer.effectAllowed = 'move';
-                });
-
-                card.addEventListener('dragend', () => {
-                    card.classList.remove('dragging');
-                    draggedCourseId = null;
-                    document.querySelectorAll('.course-list').forEach(l => l.classList.remove('drag-over'));
-                    document.querySelectorAll('.course-card').forEach(c => c.classList.remove('drop-target-before', 'drop-target-after'));
-                });
-
-                card.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!draggedCourseId) return;
-
-                    const draggingCard = document.querySelector(`.course-card[data-id="${draggedCourseId}"]`);
-                    if (draggingCard === card) return;
-
-                    const rect = card.getBoundingClientRect();
-                    const midY = rect.top + rect.height / 2;
-                    card.classList.remove('drop-target-before', 'drop-target-after');
-
-                    if (e.clientY < midY) {
-                        card.classList.add('drop-target-before');
-                    } else {
-                        card.classList.add('drop-target-after');
-                    }
-                });
-
-                card.addEventListener('dragleave', () => {
-                    card.classList.remove('drop-target-before', 'drop-target-after');
-                });
-
-                card.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!draggedCourseId) return;
-
-                    const targetSemester = card.closest('.course-list').getAttribute('data-semester');
-                    const draggedIdx = courses.findIndex(c => c.id === draggedCourseId);
-                    const targetIdx = courses.findIndex(c => c.id === card.getAttribute('data-id'));
-
-                    if (draggedIdx !== -1 && targetIdx !== -1) {
-                        const [movedCourse] = courses.splice(draggedIdx, 1);
-                        movedCourse.semester = targetSemester;
-
-                        const rect = card.getBoundingClientRect();
-                        const midY = rect.top + rect.height / 2;
-                        const insertPos = e.clientY < midY ? targetIdx : targetIdx + 1;
-
-                        courses.splice(insertPos > draggedIdx ? insertPos - 1 : insertPos, 0, movedCourse);
-                        saveState();
-                        renderAll();
-                    }
-                });
-            });
-
-            lists.forEach(list => {
-                list.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    list.classList.add('drag-over');
-                });
-
-                list.addEventListener('dragleave', () => {
-                    list.classList.remove('drag-over');
-                });
-
-                list.addEventListener('drop', (e) => {
-                    if (e.target.closest('.course-card')) return;
-                    e.preventDefault();
-                    list.classList.remove('drag-over');
-                    const newSemester = list.getAttribute('data-semester');
-                    
-                    if (draggedCourseId) {
-                        const course = courses.find(c => c.id === draggedCourseId);
-                        if (course && course.semester !== newSemester) {
-                            course.semester = newSemester;
-                            saveState();
-                            renderAll();
-                        }
-                    }
-                });
-            });
-        }
-
-        window.removeCourse = function(id, event) {
-            if (event) {
-                event.stopPropagation();
-                event.preventDefault();
-            }
-            courses = courses.filter(c => c.id !== id);
-            saveState();
-            renderAll();
-            showToast('Course removed.');
+        // Drag & Drop Handlers
+        window.allowDrop = function(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
         };
 
-        function toggleCourseCompleted(id, event) {
-            if (event) event.stopPropagation();
-            const course = courses.find(c => c.id === id);
-            if (course) {
-                course.completed = !course.completed;
-                saveState();
-                renderAll();
-            }
-        }
+        window.removeDropStyle = function(e) {
+            e.currentTarget.classList.remove('drag-over');
+        };
 
-        function openAddModal() {
+        window.dropCourse = async function(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const courseId = e.dataTransfer.getData('text/plain');
+            const targetSemester = e.currentTarget.getAttribute('data-semester');
+            if (courseId && targetSemester) {
+                try {
+                    await updateDoc(doc(db, "courses", courseId), { semester: targetSemester });
+                    showNotification("Course moved successfully");
+                } catch (err) {
+                    console.error("Error dropping course:", err);
+                }
+            }
+        };
+
+        // Modal & Utility Functions
+        window.openAddModal = function() {
             document.getElementById('modalTitle').textContent = 'Add New Course';
             document.getElementById('courseId').value = '';
-            document.getElementById('courseTitle').value = '';
-            document.getElementById('courseCredits').value = '3';
-            document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
-            const firstCb = document.querySelector('.category-checkbox[value="Univ"]');
-            if (firstCb) firstCb.checked = true;
-            document.getElementById('courseSemester').value = 'y1f';
-            document.getElementById('courseCompleted').checked = false;
+            document.getElementById('courseForm').reset();
             document.getElementById('courseModal').classList.remove('hidden');
-        }
+        };
 
-        function openEditModal(id, event) {
-            if (event) event.stopPropagation();
+        window.openEditModal = function(id) {
             const course = courses.find(c => c.id === id);
             if (!course) return;
-
             document.getElementById('modalTitle').textContent = 'Edit Course';
             document.getElementById('courseId').value = course.id;
             document.getElementById('courseTitle').value = course.title;
             document.getElementById('courseCredits').value = course.credits;
-            
-            const cats = course.categories || ['Univ'];
+            document.getElementById('courseSemester').value = course.semester;
+            document.getElementById('courseCompleted').checked = course.completed;
+
             document.querySelectorAll('.category-checkbox').forEach(cb => {
-                cb.checked = cats.includes(cb.value);
+                cb.checked = course.categories.includes(cb.value);
             });
 
-            document.getElementById('courseSemester').value = course.semester;
-            document.getElementById('courseCompleted').checked = course.completed || false;
             document.getElementById('courseModal').classList.remove('hidden');
-        }
+        };
 
-        function closeModal() {
+        window.closeModal = function() {
             document.getElementById('courseModal').classList.add('hidden');
-        }
+        };
 
-        function saveCourse(e) {
-            e.preventDefault();
-            const id = document.getElementById('courseId').value;
-            const rawTitle = document.getElementById('courseTitle').value.trim();
-            const title = cleanLeadingLabel(rawTitle);
-            const credits = parseFloat(document.getElementById('courseCredits').value) || 0;
-            
-            const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value);
-            const categories = selectedCategories.length > 0 ? selectedCategories : ['Univ'];
-
-            const semester = document.getElementById('courseSemester').value;
-            const completed = document.getElementById('courseCompleted').checked;
-
-            if (id) {
-                const course = courses.find(c => c.id === id);
-                if (course) {
-                    course.title = title;
-                    course.credits = credits;
-                    course.categories = categories;
-                    course.semester = semester;
-                    course.completed = completed;
-                }
-            } else {
-                courses.push({
-                    id: 'c_' + Date.now(),
-                    title,
-                    credits,
-                    categories,
-                    semester,
-                    completed
-                });
-            }
-
-            saveState();
-            closeModal();
-            renderAll();
-            showToast(id ? 'Course updated.' : 'Course added successfully.');
-        }
-
-        function openMoveModal(id, event) {
-            if (event) event.stopPropagation();
-            const course = courses.find(c => c.id === id);
-            if (!course) return;
-
-            document.getElementById('moveCourseId').value = course.id;
-            document.getElementById('moveCourseTitle').textContent = course.title;
-            document.getElementById('targetSemesterSelect').value = course.semester;
+        window.openMoveModal = function(id, title) {
+            document.getElementById('moveCourseId').value = id;
+            document.getElementById('moveCourseTitle').textContent = title;
             document.getElementById('moveModal').classList.remove('hidden');
-        }
+        };
 
-        function closeMoveModal() {
+        window.closeMoveModal = function() {
             document.getElementById('moveModal').classList.add('hidden');
-        }
+        };
 
-        function confirmMoveCourse() {
-            const id = document.getElementById('moveCourseId').value;
-            const targetSem = document.getElementById('targetSemesterSelect').value;
-            const course = courses.find(c => c.id === id);
-            if (course) {
-                course.semester = targetSem;
-                saveState();
-                renderAll();
-            }
-            closeMoveModal();
-            showToast('Course moved.');
-        }
-
-        function exportData() {
-            const exportPayload = {
-                transferCredits: transferCredits,
-                courses: courses
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "Academic_Four_Year_Plan_Quadrant.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast('Plan JSON exported.');
-        }
-
-        function importData(event) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        courses = imported.map(c => normalizeCategories({...c}));
-                        transferCredits = 8;
-                    } else if (imported && Array.isArray(imported.courses)) {
-                        courses = imported.courses.map(c => normalizeCategories({...c}));
-                        transferCredits = typeof imported.transferCredits === 'number' ? imported.transferCredits : 8;
-                    }
-                    const transferInput = document.getElementById('transferCreditsInput');
-                    if (transferInput) transferInput.value = transferCredits;
-
-                    saveState();
-                    renderAll();
-                    showToast('Plan imported successfully.');
-                } catch(err) {
-                    showToast('Error: Invalid JSON file format.');
-                }
-            };
-            if (event.target.files[0]) {
-                fileReader.readAsText(event.target.files[0]);
-            }
-        }
-
-        function resetToDefaultPlan() {
+        function openConfirmModal(callback) {
+            confirmCallback = callback;
             document.getElementById('confirmModal').classList.remove('hidden');
         }
 
-        function closeConfirmModal(confirmed) {
+        window.closeConfirmModal = function(confirmed) {
             document.getElementById('confirmModal').classList.add('hidden');
-            if (confirmed) {
-                courses = defaultCourses.map(c => normalizeCategories({...c}));
-                transferCredits = 8;
-                const transferInput = document.getElementById('transferCreditsInput');
-                if (transferInput) transferInput.value = 8;
-                saveState();
-                renderAll();
-                showToast('Reset to default plan template.');
-            }
-        }
+            if (confirmCallback) confirmCallback(confirmed);
+            confirmCallback = null;
+        };
 
-        function filterCourses() {
-            renderAll();
-        }
+        window.filterCourses = function() {
+            renderCourses();
+        };
 
-        function toggleDarkMode() {
+        window.toggleDarkMode = function() {
             document.documentElement.classList.toggle('dark');
-        }
+        };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initData();
-        });
+        window.exportData = function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ courses, transferCredits }, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "academic_plan.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        };
+
+        window.importData = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.courses) {
+                        for (let c of courses) await deleteDoc(doc(db, "courses", c.id));
+                        for (let c of imported.courses) {
+                            delete c.id;
+                            await addDoc(collection(db, "courses"), c);
+                        }
+                    }
+                    if (imported.transferCredits !== undefined) {
+                        await window.updateTransferCredits(imported.transferCredits);
+                    }
+                    showNotification("Plan imported successfully");
+                } catch (err) {
+                    showNotification("Error parsing JSON file");
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        function showNotification(msg) {
+            const toast = document.getElementById('notificationToast');
+            document.getElementById('notificationMessage').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
     </script>
 </body>
 </html>
