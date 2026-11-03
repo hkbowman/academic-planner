@@ -686,19 +686,26 @@
         // Drag & Drop Handlers
         window.allowDrop = function(e) {
             e.preventDefault();
-            e.currentTarget.classList.add('drag-over');
+            const targetList = e.target.closest('.course-list');
+            if (targetList) targetList.classList.add('drag-over');
         };
 
         window.removeDropStyle = function(e) {
-            e.currentTarget.classList.remove('drag-over');
+            const targetList = e.target.closest('.course-list');
+            if (targetList) targetList.classList.remove('drag-over');
         };
 
         window.dropCourse = async function(e) {
             e.preventDefault();
-            e.currentTarget.classList.remove('drag-over');
             
+            // Find the closest course-list container to ensure we capture data-semester correctly even if dropped on child elements
+            const dropContainer = e.target.closest('.course-list');
+            if (dropContainer) {
+                dropContainer.classList.remove('drag-over');
+            }
+
             const courseId = e.dataTransfer.getData('text/plain');
-            const targetSemester = e.currentTarget.getAttribute('data-semester');
+            const targetSemester = dropContainer ? dropContainer.getAttribute('data-semester') : null;
             
             if (courseId && targetSemester) {
                 try {
@@ -706,6 +713,7 @@
                     showNotification("Course moved successfully");
                 } catch (err) {
                     console.error("Error dropping course:", err);
+                    showNotification("Error moving course");
                 }
             }
         };
