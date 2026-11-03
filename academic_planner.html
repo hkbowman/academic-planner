@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+  // Your web app's Firebase configuration (without analytics)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBTkSL7odr6ck6wspa7HmcCi4ii--rKT3Q",
+    authDomain: "academic-planner-10ba9.firebaseapp.com",
+    projectId: "academic-planner-10ba9",
+    storageBucket: "academic-planner-10ba9.firebasestorage.app",
+    messagingSenderId: "283906050121",
+    appId: "1:283906050121:web:7b69a8325aa22017ff5798"
+  };
+
+  // Initialize Firebase and Firestore
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  console.log("Connected to Firestore database successfully!");
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academic Plan Planner - 2x2 Quadrant Layout</title>
