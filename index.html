@@ -91,39 +91,6 @@
     <!-- Main Container -->
     <main class="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
 
-        <!-- Top Overview Stats Bar -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
-                <div class="p-2.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg">
-                    <i data-lucide="book-open" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">Planned Credits</div>
-                    <div id="statTotalPlanned" class="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">0</div>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
-                <div class="p-2.5 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-lg">
-                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">Completed</div>
-                    <div id="statCompleted" class="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">0</div>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
-                <div class="p-2.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg">
-                    <i data-lucide="award" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">With IB/AP Transfer</div>
-                    <div id="statWithIB" class="text-xl font-black text-amber-600 dark:text-amber-400 leading-none mt-1">0</div>
-                </div>
-            </div>
-        </div>
-
         <!-- Filter Controls -->
         <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
             <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -238,31 +205,39 @@
 
         </div>
 
-        <!-- Degree Summary & Credit Formula Section -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl border-2 border-ndNavy-800 dark:border-ndGold-400 p-4 shadow-md">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">
-                <div class="space-y-2">
-                    <div>
-                        <h2 class="text-base font-bold text-ndNavy-900 dark:text-ndGold-400 flex items-center gap-1.5">
-                            <i data-lucide="graduation-cap" class="w-5 h-5"></i> Degree Clearance & Transfer Credits
-                        </h2>
-                    </div>
+        <!-- Degree Progress & Transfer Credits Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl border-2 border-ndNavy-800 dark:border-ndGold-400 p-4 shadow-md space-y-4">
+            <h2 class="text-base font-bold text-ndNavy-900 dark:text-ndGold-400 flex items-center gap-1.5">
+                <i data-lucide="graduation-cap" class="w-5 h-5"></i> Degree Progress & Transfer Credits
+            </h2>
 
-                    <!-- Interactive Transfer Credits Input -->
-                    <div class="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-700/60 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600">
-                        <label for="transferCreditsInput" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1">
-                            <i data-lucide="award" class="w-4 h-4 text-amber-500"></i> IB/AP Transfer Credits:
-                        </label>
-                        <input type="number" id="transferCreditsInput" min="0" max="60" value="8" onchange="updateTransferCredits(this.value)" onkeyup="updateTransferCredits(this.value)" class="w-16 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-500 rounded px-2 py-0.5 text-xs font-black text-slate-900 dark:text-white focus:ring-1 focus:ring-ndNavy-700 text-center">
-                    </div>
+            <!-- Credit Totals -->
+            <div class="flex flex-wrap items-stretch gap-2">
+                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900/70 px-2.5 py-1.5 rounded-lg border border-slate-400 dark:border-slate-500">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-green-600 dark:text-green-400"></i>
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 leading-tight">Completed</div>
+                    <div id="statCompleted" class="text-base font-black text-slate-900 dark:text-white leading-none">0</div>
                 </div>
-                
-                <!-- Dynamic Formula Display -->
-                <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 rounded-lg p-3 text-center min-w-[280px]">
-                    <div class="text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-300 mb-0.5">Credit Formula</div>
-                    <div class="text-sm sm:text-base font-extrabold text-amber-950 dark:text-amber-100">
-                        <span id="formulaWithIB" class="text-amber-600 dark:text-amber-400">128</span> Credits = <span id="formulaCalculated">120</span> Planned + <span id="formulaTransferCount">8</span> IB/AP Transfer
-                    </div>
+
+                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900/70 px-2.5 py-1.5 rounded-lg border border-slate-400 dark:border-slate-500">
+                    <i data-lucide="book-open" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 leading-tight">Planned Credits</div>
+                    <div id="statTotalPlanned" class="text-base font-black text-slate-900 dark:text-white leading-none">0</div>
+                </div>
+
+                <!-- Interactive Transfer Credits Input -->
+                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900/70 px-2.5 py-1.5 rounded-lg border border-slate-400 dark:border-slate-500">
+                    <i data-lucide="award" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                    <label for="transferCreditsInput" class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 leading-tight">IB/AP Transfer</label>
+                    <input type="number" id="transferCreditsInput" min="0" max="60" value="8" onchange="updateTransferCredits(this.value)" onkeyup="updateTransferCredits(this.value)" class="w-14 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-500 rounded px-1.5 py-0.5 text-sm font-black text-slate-900 dark:text-white focus:ring-1 focus:ring-ndNavy-700 text-center">
+                </div>
+            </div>
+
+            <!-- Credit Formula -->
+            <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 rounded-lg p-3 text-center">
+                <div class="text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-300 mb-0.5">Total Credits With Transfer</div>
+                <div class="text-sm sm:text-base font-extrabold text-amber-950 dark:text-amber-100">
+                    <span id="formulaWithIB" class="text-amber-600 dark:text-amber-400">128</span> Credits = <span id="formulaCalculated">120</span> Planned + <span id="formulaTransferCount">8</span> IB/AP Transfer
                 </div>
             </div>
 
@@ -642,7 +617,6 @@
             const withIB = totalPlanned + transferCredits;
 
             document.getElementById('statTotalPlanned').textContent = totalPlanned;
-            document.getElementById('statWithIB').textContent = withIB;
             document.getElementById('statCompleted').textContent = completedCount;
 
             document.getElementById('formulaCalculated').textContent = totalPlanned;
