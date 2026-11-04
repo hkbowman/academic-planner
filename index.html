@@ -581,7 +581,7 @@
 
         function createCourseCard(course, isDimmed) {
             const card = document.createElement('div');
-            card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-lg border shadow-xs flex items-center justify-between gap-2 transition-all cursor-grab active:cursor-grabbing ${isDimmed ? 'opacity-30' : 'opacity-100'} ${course.completed ? 'border-green-500/50 bg-green-50/20 dark:bg-green-950/10' : 'border-slate-200 dark:border-slate-700'}`;
+            card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-lg border shadow-xs flex items-center justify-between gap-2 transition-all cursor-grab active:cursor-grabbing ${isDimmed ? 'opacity-30' : 'opacity-100'} ${course.completed ? 'border-slate-200 dark:border-slate-700' : 'border-slate-200 dark:border-slate-700'}`;
             card.classList.add('course-card');
             card.draggable = true;
             card.dataset.courseId = course.id;
